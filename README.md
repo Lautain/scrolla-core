@@ -21,4 +21,4 @@ Instellingen zijn alleen zichtbaar voor Scrolla-beheerders (beheerder met @scrol
 
 Sites controleren één keer per week op een nieuwe GitHub-release en werken automatisch bij. Direct bijwerken: WP Toolkit > Alles bijwerken, of Dashboard > Updates > Opnieuw controleren.
 
-Release maken: tag `vX.Y.Z` met een asset `scrolla-core.zip` (map `scrolla-core/` erin) en verhoog `Version` en `SCROLLA_CORE_VERSION`.
+Release maken: verhoog `Version` en `SCROLLA_CORE_VERSION`, push, en publiceer een GitHub-release met tag `vX.Y.Z`. De broncode-zip van de release wordt automatisch gebruikt.

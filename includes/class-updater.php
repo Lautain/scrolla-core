@@ -2,7 +2,8 @@
 /**
  * Updates via GitHub-releases. Kijkt één keer per week; bij een geforceerde controle
  * (Dashboard > Updates > "Opnieuw controleren", WP-CLI / WP Toolkit "Alles bijwerken") direct.
- * Release: tag "v0.2.0" met een zip-asset "scrolla-core.zip" (map scrolla-core/ erin).
+ * Release: publiceer op GitHub een release met tag "v0.2.0". Een asset "scrolla-core.zip" is optioneel;
+ * zonder asset gebruikt de updater de broncode-zip van de tag (de map wordt hernoemd naar scrolla-core/).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -49,6 +50,9 @@ class Scrolla_Core_Updater {
 				if ( 'scrolla-core.zip' === ( $a['name'] ?? '' ) ) {
 					$zip = $a['browser_download_url'];
 				}
+			}
+			if ( ! $zip && ! empty( $json['zipball_url'] ) ) {
+				$zip = $json['zipball_url'];
 			}
 			if ( $zip ) {
 				$data = [
