@@ -6,7 +6,7 @@ Basis-plug-in voor elke website van [Scrolla!](https://www.scrolla.nl). Vervangt
 |---|---|
 | Algemeen | Bedrijfsgegevens op één plek; Elementor dynamic tags (groep Scrolla) en `[scrolla veld="telefoon" link="1"]` |
 | Beheeromgeving | Opgeruimde toolbar en dashboard, meldingen gebundeld, breder menu, systeemoverzicht, zoekmachinestatus, dupliceren |
-| Inloggen | Scrolla-loginpagina, alleen gebruikersnaam, algemene foutmelding, kolom laatste login |
+| Inloggen | Alleen gebruikersnaam, algemene foutmelding, kolom laatste login |
 | Onnodige onderdelen uit | Gutenberg, reacties, feeds, emoji, oEmbed, jQuery Migrate, Dashicons (voorkant), head-tags |
 | Beveiliging | Loginpogingen beperken met log, XML-RPC uit, gebruikers niet op te vragen, applicatiewachtwoorden uit, security-headers |
 | Afbeeldingen | Max. 2400px, jpg/png naar webp (82), revisies max. 10 (uitzondering: bestandsnaam eindigt op `-nr`) |

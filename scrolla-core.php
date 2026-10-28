@@ -32,7 +32,7 @@ function scrolla_core_modules(): array {
 	return [
 		'algemeen'   => [ 'algemeen.php', true, 'Algemeen (bedrijfsgegevens)', 'Pagina "Algemeen" met bedrijfsgegevens, socials en openingstijden; beschikbaar als dynamic tags in Elementor en als shortcode [scrolla veld="telefoon"].' ],
 		'beheer'     => [ 'beheer.php', true, 'Beheeromgeving', 'Opgeruimde toolbar en dashboard, meldingen gebundeld, breder menu, systeemoverzicht, zoekmachinestatus in de toolbar, dupliceren.' ],
-		'login'      => [ 'login.php', true, 'Inloggen', 'Scrolla-loginpagina, inloggen met gebruikersnaam, algemene foutmelding, kolom "laatste login".' ],
+		'login'      => [ 'login.php', true, 'Inloggen', 'Inloggen met gebruikersnaam, algemene foutmelding, kolom "laatste login".' ],
 		'opschonen'  => [ 'opschonen.php', true, 'Onnodige onderdelen uit', 'Gutenberg, reacties, feeds, emoji, oEmbed, jQuery Migrate, Dashicons op de voorkant, overbodige head-tags, blokwidgets.' ],
 		'beveiliging'=> [ 'beveiliging.php', true, 'Beveiliging', 'Loginpogingen beperken, XML-RPC uit, gebruikers niet op te vragen, applicatiewachtwoorden uit, bestanden bewerken uit, security-headers.' ],
 		'media'      => [ 'media.php', true, 'Afbeeldingen en optimalisatie', 'Uploads maximaal 2400px, jpg/png naar webp (82), EXIF eruit, maximaal 10 revisies, rustigere heartbeat.' ],
