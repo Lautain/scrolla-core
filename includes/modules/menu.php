@@ -71,6 +71,10 @@ class Scrolla_Menu {
 			}
 			$snap[] = $item;
 		}
+		if ( class_exists( 'Scrolla_Beheer' ) ) {
+			$order = Scrolla_Beheer::instance()->menu_order( array_column( $snap, 'slug' ) );
+			usort( $snap, fn( $a, $b ) => array_search( $a['slug'], $order, true ) <=> array_search( $b['slug'], $order, true ) );
+		}
 		if ( $snap !== get_option( self::SNAPSHOT ) ) {
 			update_option( self::SNAPSHOT, $snap, false );
 		}
@@ -92,10 +96,7 @@ class Scrolla_Menu {
 				unset( $menu[ $i ] );
 				continue;
 			}
-			if ( isset( $submenu[ $m[2] ] ) && ! $subs_allowed ) {
-				unset( $menu[ $i ] ); // hoofditem zonder toegestane subitems: weg
-				continue;
-			}
+			// Hoofditem toegestaan maar geen subitems: alleen het hoofditem tonen (subitems weg).
 			if ( isset( $submenu[ $m[2] ] ) ) {
 				foreach ( $submenu[ $m[2] ] as $j => $s ) {
 					if ( ! in_array( $slug . '>' . self::n( $s[2] ), $allowed, true ) ) {
@@ -103,7 +104,8 @@ class Scrolla_Menu {
 					}
 				}
 				// Eén toegestaan subitem: hoofditem krijgt die naam (bijv. Weergave > Menu's wordt "Menu's").
-				if ( 1 === count( $subs_allowed ) ) {
+				$only_slug = $subs_allowed ? self::n( (string) reset( $subs_allowed )[2] ) : '';
+				if ( 1 === count( $subs_allowed ) && $only_slug !== $slug ) {
 					$only          = reset( $subs_allowed );
 					$menu[ $i ][0] = $only[0];
 				}
@@ -175,8 +177,10 @@ class Scrolla_Menu {
 
 	public static function preset_editor(): array {
 		$a = [ 'index.php', 'index.php>index.php', 'scrolla-algemeen', 'edit.php?post_type=page', 'edit.php?post_type=page>edit.php?post_type=page', 'edit.php?post_type=page>post-new.php?post_type=page',
-			'edit.php', 'edit.php>edit.php', 'edit.php>post-new.php', 'edit.php>edit-tags.php?taxonomy=category', 'upload.php', 'upload.php>upload.php', 'upload.php>media-new.php',
-			'themes.php', 'themes.php>nav-menus.php', 'profile.php' ];
+			'edit.php', 'edit.php>edit.php', 'edit.php>post-new.php', 'edit.php>edit-tags.php?taxonomy=category', 'edit.php>edit-tags.php?taxonomy=post_tag',
+			'upload.php', 'upload.php>upload.php', 'upload.php>media-new.php',
+			'nav-menus.php',
+			'edit.php?post_type=elementor_library', 'elementor', 'elementor>e-form-submissions', 'profile.php' ];
 		if ( class_exists( 'Scrolla_Types' ) ) {
 			foreach ( array_keys( Scrolla_Types::config() ) as $pt ) {
 				$p   = 'edit.php?post_type=' . $pt;
@@ -202,51 +206,67 @@ class Scrolla_Menu {
 		$on    = array_map( [ self::class, 'n' ], (array) ( $r['toegestaan'] ?? [] ) );
 		$snap  = (array) get_option( self::SNAPSHOT, [] );
 		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap"><h1>Menu per rol</h1>';
+		echo '<style>
+		.sc-roles{display:flex;gap:4px;margin:0 0 12px}.sc-roles a{padding:6px 16px;border-radius:60px;text-decoration:none;color:#231439;background:#fff;border:1px solid #E7E4EC;font-size:13px;font-weight:600}
+		.sc-roles a.on{background:#231439;border-color:#231439;color:#fff}.sc-roles a i{font-style:normal;color:#EE4166;margin-left:4px}
+		.sc-bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+		.sc-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-top:12px}
+		.sc-item{border:1px solid #E7E4EC;border-radius:12px;padding:8px 12px}.sc-item.on{border-color:#231439;background:#F4F3F6}
+		.sc-item>label{font-weight:600;font-size:13px}.sc-subs{display:flex;flex-wrap:wrap;gap:2px 10px;margin:4px 0 0 22px}
+		.sc-subs label{font-size:12px;color:rgba(35,20,57,.7)}.sc-item input{margin:0 4px 0 0}
+		</style>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'menu per rol' ); echo '<p class="sc-intro">Bepaal per rol wat zichtbaar en bereikbaar is. Niet aangevinkt is verborgen, ook voor nieuwe menu-items.</p>';
 		if ( isset( $_GET['saved'] ) ) {
-			echo '<div class="notice notice-success is-dismissible"><p>Opgeslagen.</p></div>';
+			echo '<div class="notice notice-success is-dismissible sc-keep"><p>Opgeslagen.</p></div>';
 		}
-		echo '<h2 class="nav-tab-wrapper">';
+		echo '<div class="sc-roles">';
 		foreach ( $roles as $k => $label ) {
-			printf( '<a class="nav-tab %s" href="%s">%s%s</a>', $k === $role ? 'nav-tab-active' : '', esc_url( admin_url( 'admin.php?page=scrolla-menu&rol=' . $k ) ), esc_html( translate_user_role( $label ) ), ! empty( $rules[ $k ]['actief'] ) ? ' ●' : '' );
+			printf( '<a class="%s" href="%s">%s%s</a>', $k === $role ? 'on' : '', esc_url( admin_url( 'admin.php?page=scrolla-menu&rol=' . $k ) ), esc_html( translate_user_role( $label ) ), ! empty( $rules[ $k ]['actief'] ) ? '<i>●</i>' : '' );
 		}
-		echo '</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '</div><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'scrolla_menu_save' );
 		printf( '<input type="hidden" name="action" value="scrolla_menu_save"><input type="hidden" name="rol" value="%s">', esc_attr( $role ) );
-		echo '<div class="sc-card">';
-		printf( '<label class="sc-mod" style="max-width:520px"><span class="sc-switch"><input type="checkbox" name="actief" value="1" %s><span></span></span><span><strong>Beperk het menu voor %s</strong><p>Alleen aangevinkte onderdelen zijn zichtbaar en bereikbaar. Nieuwe menu-items zijn standaard verborgen.</p></span></label>', checked( ! empty( $r['actief'] ), true, false ), esc_html( translate_user_role( $roles[ $role ] ) ) );
+		echo '<div class="sc-card"><div class="sc-bar">';
+		printf( '<label><input type="checkbox" name="actief" value="1" %s> <strong>Menu beperken voor %s</strong></label>', checked( ! empty( $r['actief'] ), true, false ), esc_html( translate_user_role( $roles[ $role ] ) ) );
 		if ( 'editor' === $role ) {
-			printf( '<p><label><input type="checkbox" name="menus" value="1" %s> Redacteur mag menu\'s bewerken (Weergave &gt; Menu\'s)</label></p>', checked( ! empty( $r['menus'] ), true, false ) );
+			printf( '<label><input type="checkbox" name="menus" value="1" %s> Mag menu\'s bewerken</label>', checked( ! empty( $r['menus'] ), true, false ) );
 		}
-		echo '<p><button type="button" class="button" id="sc-preset">Scrolla-basis aanvinken</button> <button type="button" class="button" id="sc-alles">Alles aan</button> <button type="button" class="button" id="sc-niets">Alles uit</button></p>';
-		echo '<div style="columns:2 360px;column-gap:24px">';
+		echo '<span style="flex:1"></span><button type="button" class="button button-small" id="sc-preset">Scrolla-basis</button><button type="button" class="button button-small" id="sc-alles">Alles aan</button><button type="button" class="button button-small" id="sc-niets">Alles uit</button></div>';
+		echo '<div class="sc-menu">';
 		foreach ( $snap as $m ) {
-			echo '<div style="break-inside:avoid;border:1px solid #e2e4e7;border-radius:8px;padding:10px 12px;margin:0 0 12px">';
-			printf( '<label><input type="checkbox" class="sc-parent" name="toegestaan[]" value="%s" %s> <strong>%s</strong></label>', esc_attr( self::n( $m['slug'] ) ), checked( in_array( self::n( $m['slug'] ), $on, true ), true, false ), esc_html( $m['title'] ?: $m['slug'] ) );
-			foreach ( $m['sub'] as $s ) {
-				$v = self::n( $m['slug'] ) . '>' . self::n( $s['slug'] );
-				printf( '<br><label style="margin-left:22px"><input type="checkbox" class="sc-child" name="toegestaan[]" value="%s" %s> %s</label>', esc_attr( $v ), checked( in_array( $v, $on, true ), true, false ), esc_html( $s['title'] ?: $s['slug'] ) );
+			$pv = self::n( $m['slug'] );
+			$pon = in_array( $pv, $on, true );
+			printf( '<div class="sc-item%s"><label><input type="checkbox" class="sc-parent" name="toegestaan[]" value="%s" %s>%s</label>', $pon ? ' on' : '', esc_attr( $pv ), checked( $pon, true, false ), esc_html( $m['title'] ?: $m['slug'] ) );
+			if ( $m['sub'] ) {
+				echo '<div class="sc-subs">';
+				foreach ( $m['sub'] as $sub ) {
+					$v = $pv . '>' . self::n( $sub['slug'] );
+					printf( '<label><input type="checkbox" class="sc-child" name="toegestaan[]" value="%s" %s>%s</label>', esc_attr( $v ), checked( in_array( $v, $on, true ), true, false ), esc_html( $sub['title'] ?: $sub['slug'] ) );
+				}
+				echo '</div>';
 			}
 			echo '</div>';
 		}
 		echo '</div>';
 		if ( ! $snap ) {
-			echo '<p>Open één keer een willekeurig beheerscherm, dan verschijnt hier het menu.</p>';
+			echo '<p class="sc-muted">Open één keer een willekeurig beheerscherm, dan verschijnt hier het menu.</p>';
 		}
-		submit_button( 'Opslaan' );
-		echo '</div>';
-		printf( '<div class="sc-card"><h2>Export / import</h2><p class="sc-muted">Kopieer de instellingen van deze site naar een andere site als startpunt.</p><textarea name="import" rows="4" class="large-text code" placeholder="Plak hier een export om te importeren">%s</textarea><p class="sc-muted">Export van alle rollen:</p><textarea readonly rows="3" class="large-text code" onclick="this.select()">%s</textarea></div>', '', esc_textarea( wp_json_encode( $rules ) ) );
+		echo '<div class="sc-actions">';
+		submit_button( 'Opslaan', 'primary', 'submit', false );
+		echo '</div></div>';
+		printf( '<details class="sc-card"><summary style="cursor:pointer;font-weight:600">Exporteren / importeren</summary><p class="sc-muted">Kopieer de instellingen naar een andere site als startpunt.</p><div class="sc-field"><label>Export (alle rollen)</label><textarea readonly rows="2" onclick="this.select()">%s</textarea></div><div class="sc-field" style="margin-top:8px"><label>Importeren</label><textarea name="import" rows="2" placeholder="Plak een export en klik op Opslaan"></textarea></div></details>', esc_textarea( wp_json_encode( $rules ) ) );
 		echo '</form>';
 		?>
 		<script>
 		(function(){
 			var preset = <?php echo wp_json_encode( self::preset_editor() ); ?>;
 			var boxes = function(){ return document.querySelectorAll('input[name="toegestaan[]"]'); };
-			document.getElementById('sc-preset').onclick = function(){ boxes().forEach(function(b){ b.checked = preset.indexOf(b.value) > -1; }); };
-			document.getElementById('sc-alles').onclick = function(){ boxes().forEach(function(b){ b.checked = true; }); };
-			document.getElementById('sc-niets').onclick = function(){ boxes().forEach(function(b){ b.checked = false; }); };
-			document.querySelectorAll('.sc-parent').forEach(function(p){ p.addEventListener('change', function(){ p.closest('div').querySelectorAll('.sc-child').forEach(function(c){ c.checked = p.checked; }); }); });
-			document.querySelectorAll('.sc-child').forEach(function(c){ c.addEventListener('change', function(){ if (c.checked) c.closest('div').querySelector('.sc-parent').checked = true; }); });
+			var mark = function(){ document.querySelectorAll('.sc-item').forEach(function(i){ i.classList.toggle('on', i.querySelector('.sc-parent').checked); }); };
+			document.getElementById('sc-preset').onclick = function(){ boxes().forEach(function(b){ b.checked = preset.indexOf(b.value) > -1; }); mark(); };
+			document.getElementById('sc-alles').onclick = function(){ boxes().forEach(function(b){ b.checked = true; }); mark(); };
+			document.getElementById('sc-niets').onclick = function(){ boxes().forEach(function(b){ b.checked = false; }); mark(); };
+			document.querySelectorAll('.sc-parent').forEach(function(p){ p.addEventListener('change', function(){ p.closest('.sc-item').querySelectorAll('.sc-child').forEach(function(c){ c.checked = p.checked; }); mark(); }); });
+			document.querySelectorAll('.sc-child').forEach(function(c){ c.addEventListener('change', function(){ if (c.checked) c.closest('.sc-item').querySelector('.sc-parent').checked = true; mark(); }); });
 		})();
 		</script>
 		<?php

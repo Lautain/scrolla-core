@@ -76,9 +76,9 @@ class Scrolla_Algemeen {
 		}
 		$vals = (array) get_option( self::OPTION, [] );
 		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap"><h1>Algemeen</h1><p class="sc-muted">Deze gegevens worden op de hele website gebruikt (header, footer, contactpagina). Pas ze hier aan, dan zijn ze overal bijgewerkt.</p>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'algemeen' ); echo '<p class="sc-intro">Deze gegevens worden op de hele website gebruikt, zoals in de header, footer en op de contactpagina. Pas je ze hier aan, dan zijn ze overal bijgewerkt.</p>';
 		if ( isset( $_GET['saved'] ) ) {
-			echo '<div class="notice notice-success is-dismissible"><p>Opgeslagen.</p></div>';
+			echo '<div class="notice notice-success is-dismissible sc-keep"><p>Opgeslagen.</p></div>';
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'scrolla_algemeen_save' );
@@ -87,26 +87,28 @@ class Scrolla_Algemeen {
 		foreach ( self::fields() as $k => $f ) {
 			$groups[ $f[2] ][ $k ] = $f;
 		}
+		$scrolla = scrolla_is_scrolla_user();
 		foreach ( $groups as $g => $fields ) {
-			echo '<div class="sc-card"><h2>' . esc_html( $g ) . '</h2><table class="form-table sc-table">';
+			echo '<div class="sc-card"><h2>' . esc_html( $g ) . '</h2><div class="sc-fields">';
 			foreach ( $fields as $k => $f ) {
-				$v = $vals[ $k ] ?? '';
-				if ( 'textarea' === $f[1] ) {
-					$input = sprintf( '<textarea name="v[%s]" rows="4" class="large-text">%s</textarea>', esc_attr( $k ), esc_textarea( $v ) );
-				} else {
-					$input = sprintf( '<input type="%s" name="v[%s]" value="%s" class="regular-text">', 'tel' === $f[1] ? 'text' : esc_attr( $f[1] ), esc_attr( $k ), esc_attr( $v ) );
-				}
-				printf( '<tr><th>%s</th><td>%s <code class="sc-muted">[scrolla veld="%s"]</code></td></tr>', esc_html( $f[0] ), $input, esc_html( $k ) ); // phpcs:ignore
+				$v    = $vals[ $k ] ?? '';
+				$id   = 'sc-' . $k;
+				$type = [ 'url' => 'url', 'email' => 'email', 'tel' => 'tel' ][ $f[1] ] ?? 'text';
+				$in   = 'textarea' === $f[1]
+					? sprintf( '<textarea id="%s" name="v[%s]" rows="3">%s</textarea>', esc_attr( $id ), esc_attr( $k ), esc_textarea( $v ) )
+					: sprintf( '<input id="%s" type="%s" name="v[%s]" value="%s">', esc_attr( $id ), $type, esc_attr( $k ), esc_attr( $v ) );
+				$code = $scrolla ? sprintf( '<span class="sc-code" title="Klik om te kopiëren" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)">[scrolla veld="%s"]</span>', esc_html( $k ) ) : '';
+				printf( '<div class="sc-field%s"><label for="%s">%s</label>%s%s</div>', 'textarea' === $f[1] ? ' sc-wide' : '', esc_attr( $id ), esc_html( $f[0] ), $in, $code ); // phpcs:ignore
 			}
-			echo '</table></div>';
+			echo '</div></div>';
 		}
-		if ( scrolla_is_scrolla_user() ) {
+		if ( $scrolla ) {
 			$extra = (array) get_option( self::OPTION . '_extra', [] );
 			$lines = implode( "\n", array_map( fn( $k, $l ) => "$k|$l", array_keys( $extra ), $extra ) );
-			echo '<div class="sc-card"><h2>Extra velden <span class="sc-badge">alleen Scrolla</span></h2><p class="sc-muted">Eén per regel: <code>sleutel|Label</code>, bijv. <code>vestiging2|Tweede vestiging</code>.</p>';
-			printf( '<textarea name="extra" rows="4" class="large-text code">%s</textarea></div>', esc_textarea( $lines ) );
+			echo '<div class="sc-card"><h2>Extra velden <span class="sc-badge">alleen Scrolla</span></h2><div class="sc-field sc-wide">';
+			printf( '<textarea name="extra" rows="2" placeholder="sleutel|Label, bijv. vestiging2|Tweede vestiging">%s</textarea></div></div>', esc_textarea( $lines ) );
 		}
-		submit_button( 'Opslaan' );
+		submit_button( 'Opslaan', 'primary', 'submit', false );
 		echo '</form></div>';
 	}
 

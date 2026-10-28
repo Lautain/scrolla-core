@@ -79,7 +79,7 @@ class Scrolla_SMTP {
 		}
 		$o = self::opt();
 		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap"><h1>SMTP en mailog</h1>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'smtp en mailog' ); echo '';
 		if ( isset( $_GET['test'] ) ) {
 			$ok = '1' === $_GET['test'];
 			printf( '<div class="notice notice-%s is-dismissible"><p>%s</p></div>', $ok ? 'success' : 'error', $ok ? 'Testmail verstuurd.' : 'Testmail mislukt, zie het mailog.' );
@@ -127,7 +127,7 @@ class Scrolla_SMTP {
 		update_option( self::OPTION, $new, false );
 		$q = '';
 		if ( is_email( $p['test_to'] ?? '' ) ) {
-			$ok = wp_mail( $p['test_to'], 'Testmail van ' . get_bloginfo( 'name' ), "Deze testmail is verstuurd via de SMTP-instellingen van Scrolla Core.\n\n" . home_url() );
+			$ok = wp_mail( $p['test_to'], 'Testmail van ' . get_bloginfo( 'name' ), "Deze testmail is verstuurd via de SMTP-instellingen van scrolla core.\n\n" . home_url() );
 			$q  = '&test=' . ( $ok ? '1' : '0' );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=scrolla-smtp' . $q ) );

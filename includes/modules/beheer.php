@@ -7,13 +7,22 @@ defined( 'ABSPATH' ) || exit;
 
 class Scrolla_Beheer {
 
+	private static ?Scrolla_Beheer $inst = null;
+
+	public static function instance(): Scrolla_Beheer {
+		return self::$inst ??= new self();
+	}
+
 	public function __construct() {
 		add_action( 'admin_bar_menu', [ $this, 'toolbar' ], 999 );
 		add_action( 'wp_dashboard_setup', [ $this, 'dashboard' ], 999 );
 		add_filter( 'show_admin_bar', [ $this, 'show_admin_bar' ] );
 		add_action( 'admin_head', [ $this, 'admin_css' ] );
+		add_action( 'admin_menu', [ $this, 'menu_items' ], 999 );
+		add_filter( 'custom_menu_order', '__return_true' );
+		add_filter( 'menu_order', [ $this, 'menu_order' ], 999 );
 		add_action( 'admin_footer', [ $this, 'notices_js' ] );
-		add_filter( 'admin_footer_text', fn() => 'Website door <a href="https://www.scrolla.nl" target="_blank" rel="noopener">Scrolla!</a> · Vragen? <a href="mailto:support@scrolla.nl">support@scrolla.nl</a>' );
+		add_filter( 'admin_footer_text', fn() => 'Website door <a href="https://www.scrolla.nl" target="_blank" rel="noopener">scrolla | digital agency</a> · Vragen? <a href="mailto:support@scrolla.nl">support@scrolla.nl</a>' );
 		add_filter( 'update_footer', fn( $t ) => scrolla_is_scrolla_user() ? $t : '', 11 );
 		add_filter( 'media_library_infinite_scrolling', '__return_true' );
 		add_filter( 'all_plugins', [ $this, 'active_plugins_first' ] );
@@ -50,6 +59,37 @@ class Scrolla_Beheer {
 		if ( is_admin() ) {
 			$bar->add_node( [ 'id' => 'scrolla-meldingen', 'parent' => 'top-secondary', 'title' => 'Meldingen <span class="sc-count">0</span>', 'href' => '#', 'meta' => [ 'class' => 'scrolla-meldingen hidden' ] ] );
 		}
+	}
+
+	/** Snelkoppelingen Menu's en Templates, en de koppen Website / Instellingen. */
+	public function menu_items(): void {
+		global $menu;
+		if ( current_user_can( 'edit_theme_options' ) && current_theme_supports( 'menus' ) ) {
+			add_menu_page( 'Menu\'s', 'Menu\'s', 'edit_theme_options', 'nav-menus.php', '', 'dashicons-menu', 26 );
+		}
+		$exists = in_array( 'edit.php?post_type=elementor_library', array_column( (array) $menu, 2 ), true );
+		if ( ! $exists && post_type_exists( 'elementor_library' ) && current_user_can( 'edit_posts' ) ) {
+			add_menu_page( 'Templates', 'Templates', 'edit_posts', 'edit.php?post_type=elementor_library', '', 'dashicons-layout', 27 );
+		}
+		$menu[] = [ '', 'read', 'sc-kop-website', '', 'wp-menu-separator sc-kop sc-kop-website' ];
+		$menu[] = [ '', 'read', 'sc-kop-instellingen', '', 'wp-menu-separator sc-kop sc-kop-instellingen' ];
+	}
+
+	public function menu_order( $order ) {
+		if ( ! is_array( $order ) ) {
+			return $order;
+		}
+		$website = [ 'scrolla-algemeen', 'edit.php?post_type=page', 'edit.php' ];
+		if ( class_exists( 'Scrolla_Types' ) ) {
+			foreach ( array_keys( Scrolla_Types::config() ) as $pt ) {
+				$website[] = 'edit.php?post_type=' . $pt;
+			}
+		}
+		$website = array_merge( $website, [ 'upload.php', 'nav-menus.php', 'edit.php?post_type=elementor_library' ] );
+		$rest    = array_values( array_filter( $order, fn( $s ) => ! in_array( $s, $website, true ) && ! in_array( $s, [ 'index.php', 'sc-kop-website', 'sc-kop-instellingen', 'scrolla-core' ], true ) && ! str_starts_with( (string) $s, 'separator' ) ) );
+		$web     = array_values( array_filter( $website, fn( $s ) => in_array( $s, $order, true ) ) );
+		$new     = array_merge( [ 'index.php', 'sc-kop-website' ], $web, $rest ? [ 'sc-kop-instellingen' ] : [], $rest, in_array( 'scrolla-core', $order, true ) ? [ 'scrolla-core' ] : [] );
+		return $new;
 	}
 
 	public function dashboard(): void {
@@ -126,10 +166,17 @@ class Scrolla_Beheer {
 
 	public function admin_css(): void {
 		echo '<style>
-		#adminmenuback,#adminmenuwrap,#adminmenu{width:200px}#adminmenu .wp-submenu{left:200px}#wpcontent,#wpfooter{margin-left:200px}
+		#adminmenuback,#adminmenuwrap,#adminmenu{width:200px}#wpcontent,#wpfooter{margin-left:200px}
+		#adminmenu .wp-submenu{left:200px;width:200px;min-width:200px}
+		#adminmenu .wp-has-current-submenu .wp-submenu,#adminmenu .wp-has-current-submenu.opensub .wp-submenu,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu{width:auto;min-width:0;left:auto}
+		#adminmenu li.wp-menu-separator.sc-kop{height:auto;margin:14px 0 4px;cursor:default}#adminmenu li.sc-kop .separator{display:none}
+		#adminmenu li.sc-kop:after{display:block;padding:0 12px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8c8f94}
+		#adminmenu li.sc-kop-website:after{content:"Website"}#adminmenu li.sc-kop-instellingen:after{content:"Instellingen"}
+		.folded #adminmenu li.sc-kop:after{content:"";border-top:1px solid #3c434a;margin:0 8px}
 		.folded #adminmenuback,.folded #adminmenuwrap,.folded #adminmenu{width:36px}.folded #wpcontent,.folded #wpfooter{margin-left:36px}.folded #adminmenu .wp-submenu{left:36px}
 		@media (max-width:960px){.auto-fold #wpcontent,.auto-fold #wpfooter{margin-left:36px}.auto-fold #adminmenuback,.auto-fold #adminmenuwrap,.auto-fold #adminmenu{width:36px}.auto-fold #adminmenu .wp-submenu{left:36px}}
 		@media (max-width:782px){#wpcontent,.auto-fold #wpcontent,#wpfooter{margin-left:0}#adminmenu .wp-submenu{left:auto}}
+		#adminmenu li.current a.menu-top,#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,#adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head{background:#EE4166}#adminmenu .wp-submenu a:focus,#adminmenu .wp-submenu a:hover,#adminmenu a:hover,#adminmenu li.menu-top>a:focus{color:#EE4166}#adminmenu li a:focus div.wp-menu-image:before,#adminmenu li.opensub div.wp-menu-image:before,#adminmenu li:hover div.wp-menu-image:before{color:#EE4166}#adminmenu li.current a.menu-top div.wp-menu-image:before,#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu div.wp-menu-image:before{color:#fff}
 		#wpadminbar .scrolla-se-uit>.ab-item{background:#f0a400!important;color:#1d2327!important;font-weight:600}
 		#wpadminbar .scrolla-meldingen.hidden{display:none}#wpadminbar .sc-count{background:#d63638;color:#fff;border-radius:9px;padding:0 6px;margin-left:4px;font-size:11px}
 		#sc-meldingen{position:fixed;top:32px;right:12px;width:min(560px,92vw);max-height:70vh;overflow:auto;background:#fff;border:1px solid #c3c4c7;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:8px 12px;z-index:99999;display:none}
@@ -207,4 +254,4 @@ class Scrolla_Beheer {
 	}
 }
 
-new Scrolla_Beheer();
+Scrolla_Beheer::instance();

@@ -1,7 +1,7 @@
 <?php
 /**
  * Module Berichttypes en velden: bewust eenvoudig (geen repeaters of relaties).
- * Configuratie in één tekstvak (alleen Scrolla), bijvoorbeeld:
+ * Claude maakt de berichttypes per project aan via REST (POST /wp-json/scrolla/v1/types { config }), in dit formaat:
  *
  *   dienst | Dienst | Diensten | diensten | dashicons-hammer | archief, categorieen
  *     prijs | Prijs vanaf | text
@@ -76,8 +76,7 @@ class Scrolla_Types {
 		add_action( 'init', [ $this, 'register' ] );
 		add_action( 'add_meta_boxes', [ $this, 'metaboxes' ] );
 		add_action( 'save_post', [ $this, 'save_meta' ], 10, 2 );
-		add_action( 'admin_menu', [ $this, 'menu' ], 100 );
-		add_action( 'admin_post_scrolla_types_save', [ $this, 'save_config' ] );
+		add_action( 'rest_api_init', [ $this, 'rest' ] );
 		add_action( 'elementor/dynamic_tags/register', [ $this, 'register_tags' ], 20 );
 	}
 
@@ -189,47 +188,16 @@ class Scrolla_Types {
 		}
 	}
 
-	public function menu(): void {
-		if ( scrolla_is_scrolla_user() ) {
-			add_submenu_page( 'scrolla-core', 'Berichttypes', 'Berichttypes', 'manage_options', 'scrolla-types', [ $this, 'render' ] );
-		}
-	}
-
-	public function render(): void {
-		if ( ! scrolla_is_scrolla_user() ) {
-			wp_die( 'Geen toegang.' );
-		}
-		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap"><h1>Berichttypes en velden</h1>';
-		if ( isset( $_GET['saved'] ) ) {
-			echo '<div class="notice notice-success is-dismissible"><p>Opgeslagen. Permalinks zijn vernieuwd.</p></div>';
-		}
-		echo '<div class="sc-card"><p>Eén berichttype per regel, velden eronder ingesprongen.<br><code>sleutel | Enkelvoud | Meervoud | slug | dashicon | archief, categorieen</code><br><code>&nbsp;&nbsp;veldsleutel | Label | text|textarea|url|image|number|date|bool</code></p>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		wp_nonce_field( 'scrolla_types_save' );
-		echo '<input type="hidden" name="action" value="scrolla_types_save">';
-		printf( '<textarea name="config" rows="16" class="large-text code" spellcheck="false">%s</textarea>', esc_textarea( (string) get_option( self::OPTION, '' ) ) );
-		submit_button( 'Opslaan' );
-		echo '</form></div>';
-		if ( self::config() ) {
-			echo '<div class="sc-card"><h2>Resultaat</h2><table class="widefat striped"><thead><tr><th>Type</th><th>Slug</th><th>Archief</th><th>Categorieën</th><th>Velden</th></tr></thead><tbody>';
-			foreach ( self::config() as $k => $t ) {
-				$v = implode( ', ', array_map( fn( $fk, $f ) => "$f[label] ($f[type])", array_keys( $t['velden'] ), $t['velden'] ) );
-				printf( '<tr><td><span class="dashicons %s"></span> %s <code>%s</code></td><td>/%s/</td><td>%s</td><td>%s</td><td>%s</td></tr>', esc_attr( $t['icon'] ), esc_html( $t['meervoud'] ), esc_html( $k ), esc_html( $t['slug'] ), $t['archief'] ? 'ja' : 'nee', $t['categorieen'] ? 'ja' : 'nee', esc_html( $v ) );
-			}
-			echo '</tbody></table></div>';
-		}
-		echo '</div>';
-	}
-
-	public function save_config(): void {
-		if ( ! scrolla_is_scrolla_user() || ! check_admin_referer( 'scrolla_types_save' ) ) {
-			wp_die( 'Geen toegang.' );
-		}
-		update_option( self::OPTION, sanitize_textarea_field( wp_unslash( $_POST['config'] ?? '' ) ) );
-		update_option( 'scrolla_types_flush', 1 );
-		wp_safe_redirect( admin_url( 'admin.php?page=scrolla-types&saved=1' ) );
-		exit;
+	public function rest(): void {
+		register_rest_route( 'scrolla/v1', '/types', [
+			[ 'methods' => 'GET', 'permission_callback' => fn() => scrolla_is_scrolla_user(), 'callback' => fn() => [ 'config' => (string) get_option( self::OPTION, '' ), 'types' => self::config() ] ],
+			[ 'methods' => 'POST', 'permission_callback' => fn() => scrolla_is_scrolla_user(), 'callback' => function ( WP_REST_Request $r ) {
+				$config = sanitize_textarea_field( (string) ( $r->get_json_params()['config'] ?? '' ) );
+				update_option( self::OPTION, $config );
+				update_option( 'scrolla_types_flush', 1 );
+				return [ 'types' => self::parse( $config ) ];
+			} ],
+		] );
 	}
 
 	public function register_tags( $manager ): void {

@@ -24,7 +24,7 @@ h1{font-size:clamp(26px,5vw,34px);line-height:1.15;margin:0 0 14px}p{font-size:1
 @keyframes l{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}small{display:block;margin-top:40px;color:#9a9ea3;font-size:13px}small a{color:inherit}
 @media (prefers-reduced-motion:reduce){.bar span{animation:none;width:100%}}
 </style></head><body><div class="box">' . $img . '<h1>We zijn de website even aan het bijwerken</h1><p>Over een paar minuten zijn we weer terug. Deze pagina ververst vanzelf.</p><div class="bar"><span></span></div>
-<small>Website door <a href="https://www.scrolla.nl" rel="noopener">Scrolla!</a></small></div></body></html>';
+<small>Website door <a href="https://www.scrolla.nl" rel="noopener">scrolla | digital agency</a></small></div></body></html>';
 	}
 
 	private static function logo(): string {

@@ -98,10 +98,10 @@ class Scrolla_Core_Updater {
 		}
 		$r = $this->release();
 		return (object) [
-			'name'          => 'Scrolla Core',
+			'name'          => 'scrolla | digital agency | core',
 			'slug'          => dirname( $this->slug ),
 			'version'       => $r['version'] ?? $this->version,
-			'author'        => 'Scrolla!',
+			'author'        => 'scrolla | digital agency',
 			'homepage'      => "https://github.com/{$this->repo}",
 			'download_link' => $r['zip'] ?? '',
 			'last_updated'  => $r['published'] ?? '',

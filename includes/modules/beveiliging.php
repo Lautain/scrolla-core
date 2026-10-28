@@ -17,6 +17,7 @@ class Scrolla_Beveiliging {
 		add_action( 'wp_login', [ $this, 'success' ], 10, 2 );
 		add_action( 'admin_menu', [ $this, 'menu' ], 101 );
 		add_action( 'admin_post_scrolla_unlock', [ $this, 'unlock' ] );
+		add_action( 'admin_post_scrolla_whitelist', [ $this, 'save_whitelist' ] );
 
 		// XML-RPC uit
 		add_filter( 'xmlrpc_enabled', '__return_false' );
@@ -101,13 +102,29 @@ class Scrolla_Beveiliging {
 		}
 		Scrolla_Core_Settings::styles();
 		$log = (array) get_option( self::LOG, [] );
-		echo '<div class="wrap sc-wrap"><h1>Mislukte loginpogingen</h1><div class="sc-card"><p class="sc-muted">Laatste 500 pogingen. Geblokkeerde IP\'s zijn hier vrij te geven.</p><table class="widefat striped"><thead><tr><th>Tijd</th><th>IP-adres</th><th>Gebruikersnaam</th><th>Blokkade</th><th></th></tr></thead><tbody>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'loginpogingen' ); echo '<p class="sc-intro">Mislukte pogingen van de laatste tijd. Geblokkeerde IP-adressen zijn hier vrij te geven.</p>';
+		echo '<div class="sc-card"><h2>Nooit blokkeren</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		wp_nonce_field( 'scrolla_whitelist' );
+		printf( '<input type="hidden" name="action" value="scrolla_whitelist"><div class="sc-field"><textarea name="whitelist" rows="2" placeholder="Eén IP-adres per regel">%s</textarea></div><div class="sc-actions"><button class="button">Opslaan</button><span class="sc-muted">Jouw IP: %s</span></div></form></div>', esc_textarea( (string) get_option( 'scrolla_login_whitelist', '' ) ), esc_html( $this->ip() ) );
+		echo '<div class="sc-card"><table class="widefat striped sc-table"><thead><tr><th>Tijd</th><th>IP-adres</th><th>Gebruikersnaam</th><th>Blokkade</th><th></th></tr></thead><tbody>';
 		foreach ( array_slice( $log, 0, 200 ) as $r ) {
 			$active = (int) get_transient( 'scrolla_lock_' . md5( $r['ip'] ) ) > time();
 			$btn    = $active ? '<a class="button button-small" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=scrolla_unlock&ip=' . rawurlencode( $r['ip'] ) ), 'scrolla_unlock' ) ) . '">Vrijgeven</a>' : '';
 			printf( '<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>', esc_html( wp_date( 'j M H:i', $r['t'] ) ), esc_html( $r['ip'] ), esc_html( $r['user'] ), $r['lock'] ? esc_html( human_time_diff( 0, $r['lock'] ) ) : '', $btn ); // phpcs:ignore
 		}
+		if ( ! $log ) {
+			echo '<tr><td colspan="5" class="sc-muted">Nog geen mislukte pogingen.</td></tr>';
+		}
 		echo '</tbody></table></div></div>';
+	}
+
+	public function save_whitelist(): void {
+		if ( ! scrolla_is_scrolla_user() || ! check_admin_referer( 'scrolla_whitelist' ) ) {
+			wp_die( 'Geen toegang.' );
+		}
+		update_option( 'scrolla_login_whitelist', sanitize_textarea_field( wp_unslash( $_POST['whitelist'] ?? '' ) ), false );
+		wp_safe_redirect( admin_url( 'admin.php?page=scrolla-logins' ) );
+		exit;
 	}
 
 	public function unlock(): void {
