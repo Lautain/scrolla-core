@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       scrolla | digital agency | core
  * Plugin URI:        https://github.com/Lautain/scrolla-core
- * Description:       De vaste basis van elke scrolla-website: bedrijfsgegevens, opgeruimd beheer, beveiliging, optimalisaties, menu per rol, SMTP en berichttypes per project.
- * Version:           0.3.1
+ * Description:       De vaste basis van elke scrolla-website: bedrijfsgegevens, opgeruimd beheer, beveiliging, optimalisaties, menu per rol en berichttypes per project.
+ * Version:           0.3.2
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            scrolla | digital agency
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SCROLLA_CORE_VERSION', '0.3.1' );
+define( 'SCROLLA_CORE_VERSION', '0.3.2' );
 define( 'SCROLLA_CORE_FILE', __FILE__ );
 define( 'SCROLLA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCROLLA_CORE_URL', plugin_dir_url( __FILE__ ) );
@@ -26,10 +26,10 @@ require_once SCROLLA_CORE_DIR . 'includes/class-updater.php';
 
 /**
  * Onderdelen. Alles staat standaard aan: dit is de Scrolla-standaard voor elke site.
- * SMTP doet pas iets als er een server is ingevuld; berichttypes alleen als Claude ze per project aanmaakt.
+ * Berichttypes doen pas iets als Claude ze per project aanmaakt.
  */
 function scrolla_core_modules(): array {
-	return [ 'algemeen', 'beheer', 'login', 'opschonen', 'beveiliging', 'media', 'menu', 'smtp', 'onderhoud', 'bouwen', 'types' ];
+	return [ 'algemeen', 'beheer', 'login', 'opschonen', 'beveiliging', 'media', 'menu', 'onderhoud', 'bouwen', 'types' ];
 }
 
 add_action( 'plugins_loaded', function () {

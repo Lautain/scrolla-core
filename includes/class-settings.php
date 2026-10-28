@@ -31,7 +31,7 @@ class Scrolla_Core_Settings {
 		if ( ! scrolla_is_scrolla_user() ) {
 			return;
 		}
-		add_menu_page( 'scrolla | digital agency | core', 'scrolla core', 'manage_options', 'scrolla-core', [ $this, 'render' ], self::icon(), 99 );
+		add_menu_page( 'scrolla | digital agency | core', 'scrolla', 'manage_options', 'scrolla-core', [ $this, 'render' ], self::icon(), 99 );
 		add_submenu_page( 'scrolla-core', 'Overzicht', 'Overzicht', 'manage_options', 'scrolla-core', [ $this, 'render' ] );
 	}
 
@@ -72,7 +72,7 @@ class Scrolla_Core_Settings {
 		$rel = get_site_transient( 'scrolla_core_release' );
 		$new = is_array( $rel ) && ! empty( $rel['version'] ) && version_compare( $rel['version'], SCROLLA_CORE_VERSION, '>' );
 		echo '<div class="wrap sc-wrap">';
-		self::head( 'scrolla core', SCROLLA_CORE_VERSION );
+		self::head( 'scrolla', SCROLLA_CORE_VERSION );
 		echo '<p class="sc-intro">De Scrolla-standaard voor deze website. Alles staat vast ingesteld; updates komen automatisch via GitHub.</p>';
 
 		echo '<div class="sc-card"><h2>Updates</h2><p style="margin:0">';

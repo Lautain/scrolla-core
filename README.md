@@ -11,7 +11,6 @@ Basis-plug-in voor elke website van [Scrolla!](https://www.scrolla.nl). Vervangt
 | Beveiliging | Loginpogingen beperken met log, XML-RPC uit, gebruikers niet op te vragen, applicatiewachtwoorden uit, security-headers |
 | Afbeeldingen | Max. 2400px, jpg/png naar webp (82), revisies max. 10 (uitzondering: bestandsnaam eindigt op `-nr`) |
 | Menu per rol | Whitelist per rol, ook URL-toegang geblokkeerd; alleen Scrolla kan het instellen |
-| SMTP | Mail via SMTP met testmail en mailog |
 | Onderhoud | Onderhoudspagina tijdens updates (drop-in) en handmatige onderhoudsmodus |
 | Bouwen | REST-importpunt (alleen Scrolla) voor Elementor-pagina's, templates, kit en afbeeldingen; gebruikt door de ontwikkeltool |
 | Berichttypes | Eenvoudige CPT's met velden, als dynamic tags in Elementor |
