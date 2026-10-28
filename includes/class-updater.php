@@ -22,6 +22,8 @@ class Scrolla_Core_Updater {
 		$this->repo    = $repo;
 		$this->version = $version;
 		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check' ] );
+		// Ook bij het lezen: zo ziet WordPress (en WP Toolkit) een nieuwe release zodra onze eigen controle hem kent.
+		add_filter( 'site_transient_update_plugins', [ $this, 'check' ] );
 		add_filter( 'plugins_api', [ $this, 'info' ], 20, 3 );
 		add_filter( 'upgrader_source_selection', [ $this, 'fix_folder' ], 10, 4 );
 		add_filter( 'auto_update_plugin', [ $this, 'auto_update' ], 10, 2 );
