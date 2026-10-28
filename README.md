@@ -13,6 +13,7 @@ Basis-plug-in voor elke website van [Scrolla!](https://www.scrolla.nl). Vervangt
 | Menu per rol | Whitelist per rol, ook URL-toegang geblokkeerd; alleen Scrolla kan het instellen |
 | SMTP | Mail via SMTP met testmail en mailog |
 | Onderhoud | Onderhoudspagina tijdens updates (drop-in) en handmatige onderhoudsmodus |
+| Bouwen | REST-importpunt (alleen Scrolla) voor Elementor-pagina's, templates, kit en afbeeldingen; gebruikt door de ontwikkeltool |
 | Berichttypes | Eenvoudige CPT's met velden, als dynamic tags in Elementor |
 
 Instellingen zijn alleen zichtbaar voor Scrolla-beheerders (beheerder met @scrolla.nl-adres of gebruiker "Scrolla").

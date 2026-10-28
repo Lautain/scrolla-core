@@ -3,7 +3,7 @@
  * Plugin Name:       Scrolla Core
  * Plugin URI:        https://github.com/Lautain/scrolla-core
  * Description:       Basis voor elke Scrolla!-website: bedrijfsgegevens, beheer, beveiliging, optimalisaties, menu-editor per rol, SMTP en eenvoudige berichttypes met velden.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            Scrolla!
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SCROLLA_CORE_VERSION', '0.1.0' );
+define( 'SCROLLA_CORE_VERSION', '0.2.0' );
 define( 'SCROLLA_CORE_FILE', __FILE__ );
 define( 'SCROLLA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCROLLA_CORE_URL', plugin_dir_url( __FILE__ ) );
@@ -39,6 +39,7 @@ function scrolla_core_modules(): array {
 		'menu'       => [ 'menu.php', true, 'Menu per rol', 'Bepaal per rol welke menu-items zichtbaar zijn. Verborgen pagina\'s zijn ook niet via de URL bereikbaar.' ],
 		'smtp'       => [ 'smtp.php', false, 'SMTP', 'Mail via een SMTP-server (bijv. noreply@ van de klant), met testmail en een mailog van 30 dagen.' ],
 		'onderhoud'  => [ 'onderhoud.php', true, 'Onderhoud', 'Nette onderhoudspagina tijdens updates (met naam en logo van de site) en een knop in de toolbar om de site handmatig in onderhoud te zetten.' ],
+		'bouwen'     => [ 'bouwen.php', true, 'Bouwen (Elementor-import)', 'REST-importpunt voor Scrolla-beheerders: Elementor-pagina\'s, templates en kit aanmaken en bijwerken, afbeeldingen importeren. Gebruikt door de ontwikkeltool.' ],
 		'types'      => [ 'types.php', true, 'Berichttypes en velden', 'Eenvoudige berichttypes (diensten, vacatures, ...) met velden, als dynamic tags in Elementor.' ],
 	];
 }
