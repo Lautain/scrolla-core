@@ -79,26 +79,26 @@ class Scrolla_SMTP {
 		}
 		$o = self::opt();
 		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'smtp en mailog' ); echo '';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'SMTP en mailog' ); echo '';
 		if ( isset( $_GET['test'] ) ) {
 			$ok = '1' === $_GET['test'];
 			printf( '<div class="notice notice-%s is-dismissible"><p>%s</p></div>', $ok ? 'success' : 'error', $ok ? 'Testmail verstuurd.' : 'Testmail mislukt, zie het mailog.' );
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'scrolla_smtp_save' );
-		echo '<input type="hidden" name="action" value="scrolla_smtp_save"><div class="sc-card"><table class="form-table sc-table">';
+		echo '<input type="hidden" name="action" value="scrolla_smtp_save"><div class="sc-card"><table class="form-table">';
 		$row = fn( $l, $h ) => printf( '<tr><th>%s</th><td>%s</td></tr>', esc_html( $l ), $h ); // phpcs:ignore
-		$row( 'SMTP-server', sprintf( '<input name="host" value="%s" class="regular-text" placeholder="smtp.gmail.com">', esc_attr( $o['host'] ) ) );
+		$row( 'SMTP-server', sprintf( '<input type="text" name="host" value="%s" class="regular-text" placeholder="smtp.gmail.com">', esc_attr( $o['host'] ) ) );
 		$row( 'Poort', sprintf( '<input name="port" type="number" value="%d" class="small-text">', (int) $o['port'] ) );
 		$sel = '';
 		foreach ( [ 'tls' => 'TLS (587)', 'ssl' => 'SSL (465)', 'none' => 'Geen' ] as $k => $l ) {
 			$sel .= sprintf( '<option value="%s" %s>%s</option>', $k, selected( $o['secure'], $k, false ), $l );
 		}
 		$row( 'Versleuteling', '<select name="secure">' . $sel . '</select>' );
-		$row( 'Gebruikersnaam', sprintf( '<input name="user" value="%s" class="regular-text" autocomplete="off">', esc_attr( $o['user'] ) ) );
+		$row( 'Gebruikersnaam', sprintf( '<input type="text" name="user" value="%s" class="regular-text" autocomplete="off">', esc_attr( $o['user'] ) ) );
 		$row( 'Wachtwoord', '<input name="pass" type="password" value="" class="regular-text" autocomplete="new-password" placeholder="' . ( $o['pass'] ? '•••••••• (ongewijzigd laten)' : '' ) . '">' );
-		$row( 'Afzender e-mail', sprintf( '<input name="from" value="%s" class="regular-text" placeholder="noreply@klantdomein.nl">', esc_attr( $o['from'] ) ) );
-		$row( 'Afzender naam', sprintf( '<input name="from_name" value="%s" class="regular-text" placeholder="%s">', esc_attr( $o['from_name'] ), esc_attr( get_bloginfo( 'name' ) ) ) );
+		$row( 'Afzender e-mail', sprintf( '<input type="email" name="from" value="%s" class="regular-text" placeholder="noreply@klantdomein.nl">', esc_attr( $o['from'] ) ) );
+		$row( 'Afzender naam', sprintf( '<input type="text" name="from_name" value="%s" class="regular-text" placeholder="%s">', esc_attr( $o['from_name'] ), esc_attr( get_bloginfo( 'name' ) ) ) );
 		$row( 'Testmail naar', '<input name="test_to" type="email" class="regular-text" placeholder="noreply@scrolla.nl"> <span class="sc-muted">Invullen = na opslaan een testmail sturen</span>' );
 		echo '</table>';
 		submit_button( 'Opslaan' );

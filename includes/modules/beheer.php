@@ -22,7 +22,7 @@ class Scrolla_Beheer {
 		add_filter( 'custom_menu_order', '__return_true' );
 		add_filter( 'menu_order', [ $this, 'menu_order' ], 999 );
 		add_action( 'admin_footer', [ $this, 'notices_js' ] );
-		add_filter( 'admin_footer_text', fn() => 'Website door <a href="https://www.scrolla.nl" target="_blank" rel="noopener">scrolla | digital agency</a> · Vragen? <a href="mailto:support@scrolla.nl">support@scrolla.nl</a>' );
+		add_filter( 'admin_footer_text', fn() => 'Website door <a href="https://www.scrolla.nl" target="_blank" rel="noopener">Scrolla!</a> · Vragen? <a href="mailto:support@scrolla.nl">support@scrolla.nl</a>' );
 		add_filter( 'update_footer', fn( $t ) => scrolla_is_scrolla_user() ? $t : '', 11 );
 		add_filter( 'media_library_infinite_scrolling', '__return_true' );
 		add_filter( 'all_plugins', [ $this, 'active_plugins_first' ] );
@@ -176,7 +176,6 @@ class Scrolla_Beheer {
 		.folded #adminmenuback,.folded #adminmenuwrap,.folded #adminmenu{width:36px}.folded #wpcontent,.folded #wpfooter{margin-left:36px}.folded #adminmenu .wp-submenu{left:36px}
 		@media (max-width:960px){.auto-fold #wpcontent,.auto-fold #wpfooter{margin-left:36px}.auto-fold #adminmenuback,.auto-fold #adminmenuwrap,.auto-fold #adminmenu{width:36px}.auto-fold #adminmenu .wp-submenu{left:36px}}
 		@media (max-width:782px){#wpcontent,.auto-fold #wpcontent,#wpfooter{margin-left:0}#adminmenu .wp-submenu{left:auto}}
-		#adminmenu li.current a.menu-top,#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,#adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head{background:#EE4166}#adminmenu .wp-submenu a:focus,#adminmenu .wp-submenu a:hover,#adminmenu a:hover,#adminmenu li.menu-top>a:focus{color:#EE4166}#adminmenu li a:focus div.wp-menu-image:before,#adminmenu li.opensub div.wp-menu-image:before,#adminmenu li:hover div.wp-menu-image:before{color:#EE4166}#adminmenu li.current a.menu-top div.wp-menu-image:before,#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu div.wp-menu-image:before{color:#fff}
 		#wpadminbar .scrolla-se-uit>.ab-item{background:#f0a400!important;color:#1d2327!important;font-weight:600}
 		#wpadminbar .scrolla-meldingen.hidden{display:none}#wpadminbar .sc-count{background:#d63638;color:#fff;border-radius:9px;padding:0 6px;margin-left:4px;font-size:11px}
 		#sc-meldingen{position:fixed;top:32px;right:12px;width:min(560px,92vw);max-height:70vh;overflow:auto;background:#fff;border:1px solid #c3c4c7;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:8px 12px;z-index:99999;display:none}

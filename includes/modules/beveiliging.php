@@ -102,7 +102,7 @@ class Scrolla_Beveiliging {
 		}
 		Scrolla_Core_Settings::styles();
 		$log = (array) get_option( self::LOG, [] );
-		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'loginpogingen' ); echo '<p class="sc-intro">Mislukte pogingen van de laatste tijd. Geblokkeerde IP-adressen zijn hier vrij te geven.</p>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'Loginpogingen' ); echo '<p class="sc-intro">Mislukte pogingen van de laatste tijd. Geblokkeerde IP-adressen zijn hier vrij te geven.</p>';
 		echo '<div class="sc-card"><h2>Nooit blokkeren</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( 'scrolla_whitelist' );
 		printf( '<input type="hidden" name="action" value="scrolla_whitelist"><div class="sc-field"><textarea name="whitelist" rows="2" placeholder="Eén IP-adres per regel">%s</textarea></div><div class="sc-actions"><button class="button">Opslaan</button><span class="sc-muted">Jouw IP: %s</span></div></form></div>', esc_textarea( (string) get_option( 'scrolla_login_whitelist', '' ) ), esc_html( $this->ip() ) );

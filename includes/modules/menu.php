@@ -207,15 +207,15 @@ class Scrolla_Menu {
 		$snap  = (array) get_option( self::SNAPSHOT, [] );
 		Scrolla_Core_Settings::styles();
 		echo '<style>
-		.sc-roles{display:flex;gap:4px;margin:0 0 12px}.sc-roles a{padding:6px 16px;border-radius:60px;text-decoration:none;color:#231439;background:#fff;border:1px solid #E7E4EC;font-size:13px;font-weight:600}
-		.sc-roles a.on{background:#231439;border-color:#231439;color:#fff}.sc-roles a i{font-style:normal;color:#EE4166;margin-left:4px}
+		.sc-roles{display:flex;gap:4px;margin:0 0 12px}.sc-roles a{padding:6px 16px;border-radius:4px;text-decoration:none;color:#2271b1;background:#fff;border:1px solid #c3c4c7;font-size:13px;font-weight:600}
+		.sc-roles a.on{background:#2271b1;border-color:#2271b1;color:#fff}.sc-roles a i{font-style:normal;color:#00a32a;margin-left:4px}
 		.sc-bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
 		.sc-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-top:12px}
-		.sc-item{border:1px solid #E7E4EC;border-radius:12px;padding:8px 12px}.sc-item.on{border-color:#231439;background:#F4F3F6}
+		.sc-item{border:1px solid #c3c4c7;border-radius:4px;padding:8px 12px}.sc-item.on{border-color:#2271b1;background:#f0f6fc}
 		.sc-item>label{font-weight:600;font-size:13px}.sc-subs{display:flex;flex-wrap:wrap;gap:2px 10px;margin:4px 0 0 22px}
-		.sc-subs label{font-size:12px;color:rgba(35,20,57,.7)}.sc-item input{margin:0 4px 0 0}
+		.sc-subs label{font-size:12px;color:#50575e}.sc-item input{margin:0 4px 0 0}
 		</style>';
-		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'menu per rol' ); echo '<p class="sc-intro">Bepaal per rol wat zichtbaar en bereikbaar is. Niet aangevinkt is verborgen, ook voor nieuwe menu-items.</p>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'Menu per rol' ); echo '<p class="sc-intro">Bepaal per rol wat zichtbaar en bereikbaar is. Niet aangevinkt is verborgen, ook voor nieuwe menu-items.</p>';
 		if ( isset( $_GET['saved'] ) ) {
 			echo '<div class="notice notice-success is-dismissible sc-keep"><p>Opgeslagen.</p></div>';
 		}

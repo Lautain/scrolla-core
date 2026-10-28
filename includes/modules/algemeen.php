@@ -76,7 +76,7 @@ class Scrolla_Algemeen {
 		}
 		$vals = (array) get_option( self::OPTION, [] );
 		Scrolla_Core_Settings::styles();
-		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'algemeen' ); echo '<p class="sc-intro">Deze gegevens worden op de hele website gebruikt, zoals in de header, footer en op de contactpagina. Pas je ze hier aan, dan zijn ze overal bijgewerkt.</p>';
+		echo '<div class="wrap sc-wrap">'; Scrolla_Core_Settings::head( 'Algemeen' ); echo '<p class="sc-intro">Deze gegevens worden op de hele website gebruikt, zoals in de header, footer en op de contactpagina. Pas je ze hier aan, dan zijn ze overal bijgewerkt.</p>';
 		if ( isset( $_GET['saved'] ) ) {
 			echo '<div class="notice notice-success is-dismissible sc-keep"><p>Opgeslagen.</p></div>';
 		}
