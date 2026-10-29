@@ -9,5 +9,36 @@
     "hello-elementor": "3.5.1"
   },
   "terugdraaien": {},
-  "meting": {}
+  "meting": {
+    "/|desktop": {
+      "hoogte": 900,
+      "elementen": 18,
+      "widgets": 0
+    },
+    "/onderhoudstest/|desktop": {
+      "hoogte": 1935,
+      "elementen": 90,
+      "widgets": 8
+    },
+    "/contact/|desktop": {
+      "hoogte": 900,
+      "elementen": 18,
+      "widgets": 0
+    },
+    "/|mobiel": {
+      "hoogte": 900,
+      "elementen": 18,
+      "widgets": 0
+    },
+    "/onderhoudstest/|mobiel": {
+      "hoogte": 1445,
+      "elementen": 90,
+      "widgets": 8
+    },
+    "/contact/|mobiel": {
+      "hoogte": 900,
+      "elementen": 18,
+      "widgets": 0
+    }
+  }
 }
