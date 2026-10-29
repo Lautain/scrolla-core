@@ -91,6 +91,7 @@ class Scrolla_Core_Settings {
 			'Afbeeldingen max. ' . $s['media_max'] . 'px en webp (kwaliteit ' . $s['media_quality'] . ')',
 			'Maximaal ' . $s['revisions'] . ' revisies',
 			'Onderhoudspagina tijdens updates en onderhoudsknop in de toolbar',
+			'Geteste updates: de stack werkt alleen bij naar versies die Claude eerst op de blueprint heeft getest',
 			'Menu per rol (zie submenu)',
 			'Importpunt voor de ontwikkeltool',
 		];

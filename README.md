@@ -22,3 +22,7 @@ Instellingen zijn alleen zichtbaar voor Scrolla-beheerders (beheerder met @scrol
 Sites controleren één keer per week op een nieuwe GitHub-release en werken automatisch bij. Direct bijwerken: WP Toolkit > Alles bijwerken, of Dashboard > Updates > Opnieuw controleren.
 
 Release maken: verhoog `Version` en `SCROLLA_CORE_VERSION`, push, en publiceer een GitHub-release met tag `vX.Y.Z`. De broncode-zip van de release wordt automatisch gebruikt.
+
+## Geteste updates
+
+bp.scrolla.dev staat in kanariemodus (`scrolla_kanarie` = 1) en werkt alles direct bij. Claude test de blueprint en zet de geteste versies in `onderhoud.json`. Elke site haalt dat bestand dagelijks op en werkt de stack automatisch bij tot en met die versies. `terugdraaien` (plug-in of thema van wordpress.org, optioneel per site) zet een versie terug. Status: `GET /wp-json/scrolla/v1/status`.
