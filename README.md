@@ -25,4 +25,4 @@ Release maken: verhoog `Version` en `SCROLLA_CORE_VERSION`, push, en publiceer e
 
 ## Geteste updates
 
-bp.scrolla.dev staat in kanariemodus (`scrolla_kanarie` = 1) en werkt alles direct bij. Claude test de blueprint en zet de geteste versies in `onderhoud.json`. Elke site haalt dat bestand dagelijks op en werkt de stack automatisch bij tot en met die versies. `terugdraaien` (plug-in of thema van wordpress.org, optioneel per site) zet een versie terug. Status: `GET /wp-json/scrolla/v1/status`.
+bp.scrolla.dev staat in kanariemodus (`scrolla_kanarie` = `bp.scrolla.dev`; geldt alleen op die host, klonen erven het dus niet) en werkt alles direct bij. Claude test de blueprint en zet de geteste versies in `onderhoud.json`. Elke site haalt dat bestand dagelijks op en werkt de stack automatisch bij tot en met die versies. `terugdraaien` (plug-in of thema van wordpress.org, optioneel per site) zet een versie terug. Status: `GET /wp-json/scrolla/v1/status`.

@@ -3,7 +3,7 @@
  * Module Updates: geteste updates voor de vaste stack.
  *
  * Werkwijze
- * - bp.scrolla.dev staat in kanariemodus: daar komt elke update direct binnen.
+ * - bp.scrolla.dev staat in kanariemodus (optie scrolla_kanarie = 'bp.scrolla.dev'): daar komt elke update direct binnen.
  * - Claude test de kanarie en zet de geteste versies in onderhoud.json in de GitHub-repo.
  * - Elke site leest dat bestand dagelijks. Automatische updates van de stack (WordPress, Elementor, Elementor Pro,
  *   Rank Math, Hello Elementor, ...) gaan alleen door tot en met de goedgekeurde versie.
@@ -27,6 +27,7 @@ class Scrolla_Updates {
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'schedule' ] );
+		add_action( 'template_redirect', [ $this, 'testpagina' ], 0 );
 		add_action( self::HOOK, [ $this, 'sync' ] );
 		add_filter( 'auto_update_plugin', [ $this, 'gate_plugin' ], 20, 2 );
 		add_filter( 'auto_update_theme', [ $this, 'gate_theme' ], 20, 2 );
@@ -49,8 +50,19 @@ class Scrolla_Updates {
 		return (array) get_option( self::OPTION, [] );
 	}
 
+	/** Kanarie alleen op de host die in de optie staat, zodat klonen van de blueprint dit niet erven. */
 	public static function kanarie(): bool {
-		return (bool) get_option( self::KANARIE );
+		$host = (string) get_option( self::KANARIE, '' );
+		return '' !== $host && wp_parse_url( home_url(), PHP_URL_HOST ) === $host;
+	}
+
+	/** De testpagina van de kanarie bestaat op andere sites niet (vangnet als hij na het klonen is blijven staan). */
+	public function testpagina(): void {
+		if ( is_page( 'onderhoudstest' ) && ! self::kanarie() ) {
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+		}
 	}
 
 	public function schedule(): void {
