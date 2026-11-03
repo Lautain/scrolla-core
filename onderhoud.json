@@ -1,5 +1,5 @@
 {
-  "bijgewerkt": "2026-10-29",
+  "bijgewerkt": "2026-11-03",
   "toelichting": "Geteste versies van de vaste stack. Sites werken automatisch bij tot en met deze versies. Beheer: Claude (skill onderhoud).",
   "stack": {
     "wordpress": "7.1.4",
