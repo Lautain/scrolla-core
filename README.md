@@ -26,6 +26,10 @@ Sites controleren één keer per week op een nieuwe GitHub-release en werken aut
 
 Release maken: verhoog `Version` en `SCROLLA_CORE_VERSION`, push, en publiceer een GitHub-release met tag `vX.Y.Z`. De broncode-zip van de release wordt automatisch gebruikt.
 
+## Updates
+
+Alle plug-ins en thema's werken automatisch bij. Uitzondering per site via het filter `scrolla_geen_autoupdate` (lijst met slugs).
+
 ## Geteste updates
 
 bp.scrolla.dev staat in kanariemodus (`scrolla_kanarie` = `bp.scrolla.dev`; geldt alleen op die host, klonen erven het dus niet) en werkt alles direct bij. Claude test de blueprint en zet de geteste versies in `onderhoud.json`. Elke site haalt dat bestand dagelijks op en werkt de stack automatisch bij tot en met die versies. `terugdraaien` (plug-in of thema van wordpress.org, optioneel per site) zet een versie terug. Status: `GET /wp-json/scrolla/v1/status`.

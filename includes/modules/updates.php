@@ -7,7 +7,8 @@
  * - Claude test de kanarie en zet de geteste versies in onderhoud.json in de GitHub-repo.
  * - Elke site leest dat bestand dagelijks. Automatische updates van de stack (WordPress, Elementor, Elementor Pro,
  *   Rank Math, Hello Elementor, ...) gaan alleen door tot en met de goedgekeurde versie.
- * - Plug-ins buiten de lijst volgen de gewone instelling voor automatische updates van de site.
+ * - Plug-ins en thema's buiten de lijst werken altijd automatisch bij (Scrolla-standaard). Uitzondering per site:
+ *   add_filter( 'scrolla_geen_autoupdate', fn( $slugs ) => [ ...$slugs, 'plugin-slug' ] );
  * - "terugdraaien" in onderhoud.json zet een plug-in of thema van wordpress.org terug naar een opgegeven versie.
  * - Fatale fouten worden geteld; WordPress draait een plug-in-autoupdate met een fatale fout zelf terug.
  * - GET /wp-json/scrolla/v1/status geeft een korte, publieke status zonder versienummers (behalve op de kanarie).
@@ -97,7 +98,8 @@ class Scrolla_Updates {
 		}
 		$ok = $this->approved( $slug );
 		if ( null === $ok ) {
-			return null; // niet in de stack: gewone instelling
+			// Niet in de stack: altijd automatisch bijwerken, tenzij bewust uitgezonderd.
+			return in_array( $slug, (array) apply_filters( 'scrolla_geen_autoupdate', [] ), true ) ? null : true;
 		}
 		if ( self::kanarie() ) {
 			return true;
@@ -119,6 +121,9 @@ class Scrolla_Updates {
 	}
 
 	public function gate_core( $update, $item ) {
+		if ( null === $this->approved( 'wordpress' ) ) {
+			return $update;
+		}
 		$ok = $this->ok( 'wordpress', (string) ( $item->current ?? '' ) );
 		return null === $ok ? $update : $ok;
 	}
