@@ -5,13 +5,16 @@ Basis-plug-in voor elke website van [Scrolla!](https://www.scrolla.nl). Vervangt
 | Module | Wat het doet |
 |---|---|
 | Algemeen | Bedrijfsgegevens op één plek; Elementor dynamic tags (groep Scrolla) en `[scrolla veld="telefoon" link="1"]` |
-| Beheeromgeving | Opgeruimde toolbar en dashboard, meldingen gebundeld, breder menu, systeemoverzicht, zoekmachinestatus, dupliceren |
-| Inloggen | Alleen gebruikersnaam, algemene foutmelding, kolom laatste login |
+| Beheeromgeving | Dashboard "[Bedrijfsnaam] beheerder" met tegels en laatst bewerkt, accent in de huiskleur voor klanten, opgeruimde toolbar, meldingen gebundeld, breder menu, systeemoverzicht, zoekmachinestatus, dupliceren |
+| Huisstijl | Leest logo, kleuren, fonts en knopradius uit de Elementor-kit; gebruikt door inloggen, mail, onderhoud en beheer. Eigen loginachtergrond: globale kleur "Login achtergrond" in de kit |
+| Inloggen | Inlogpagina in de huisstijl, alleen gebruikersnaam, algemene foutmelding, kolom laatste login |
+| Mail | Alle mails (formulieren, wachtwoord, systeem) in een HTML-template in de huisstijl; volledige HTML-mails (WooCommerce) blijven ongemoeid |
+| Klantrol | Rol "[Bedrijfsnaam] beheerder" (Redacteur + menu's, met WooCommerce ook winkelbeheer), standaard beperkt via Menu per rol |
 | Onnodige onderdelen uit | Gutenberg, reacties, feeds, emoji, oEmbed, jQuery Migrate, Dashicons (voorkant), head-tags |
 | Beveiliging | Loginpogingen beperken met log, XML-RPC uit, gebruikers niet op te vragen, applicatiewachtwoorden uit, security-headers |
 | Afbeeldingen | Max. 2400px, jpg/png naar webp (82), revisies max. 10 (uitzondering: bestandsnaam eindigt op `-nr`) |
 | Menu per rol | Whitelist per rol, ook URL-toegang geblokkeerd; alleen Scrolla kan het instellen |
-| Onderhoud | Onderhoudspagina tijdens updates (drop-in) en handmatige onderhoudsmodus |
+| Onderhoud | Onderhoudspagina in de huisstijl tijdens updates (drop-in) en handmatige onderhoudsmodus |
 | Bouwen | REST-importpunt (alleen Scrolla) voor Elementor-pagina's, templates, kit en afbeeldingen; gebruikt door de ontwikkeltool |
 | Berichttypes | Eenvoudige CPT's met velden, als dynamic tags in Elementor |
 

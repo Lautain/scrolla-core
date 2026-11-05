@@ -105,27 +105,79 @@ class Scrolla_Beheer {
 			}
 		}
 		remove_action( 'welcome_panel', 'wp_welcome_panel' );
-		wp_add_dashboard_widget( 'scrolla_welkom', 'Welkom bij je website', [ $this, 'widget_welkom' ] );
+		wp_add_dashboard_widget( 'scrolla_welkom', class_exists( 'Scrolla_Klant' ) ? Scrolla_Klant::naam() : 'Welkom bij je website', [ $this, 'widget_welkom' ] );
 		if ( scrolla_is_scrolla_user() ) {
 			add_meta_box( 'scrolla_systeem', 'Systeemoverzicht', [ $this, 'widget_systeem' ], 'dashboard', 'side', 'high' );
 		}
 	}
 
 	public function widget_welkom(): void {
+		$h     = class_exists( 'Scrolla_Huisstijl' ) ? Scrolla_Huisstijl::get() : null;
+		$p     = $h ? $h['kleur']['primair'] : '#2271b1';
+		$zacht = $h ? Scrolla_Huisstijl::mix( $p, '#ffffff', 0.92 ) : '#f0f6fc';
 		$links = [
-			[ 'edit.php?post_type=page', 'Pagina\'s', 'dashicons-admin-page', 'edit_pages' ],
-			[ 'edit.php', 'Berichten', 'dashicons-admin-post', 'edit_posts' ],
-			[ 'upload.php', 'Media', 'dashicons-admin-media', 'upload_files' ],
-			[ 'admin.php?page=scrolla-algemeen', 'Algemeen', 'dashicons-building', 'edit_pages' ],
-			[ 'nav-menus.php', 'Menu\'s', 'dashicons-menu', 'edit_theme_options' ],
+			[ 'edit.php?post_type=page', 'Pagina\'s', 'dashicons-admin-page' ],
+			[ 'edit.php', 'Berichten', 'dashicons-admin-post' ],
 		];
-		echo '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">';
-		foreach ( $links as $l ) {
-			if ( current_user_can( $l[3] ) ) {
-				printf( '<a href="%s" style="display:flex;gap:8px;align-items:center;padding:12px;border:1px solid #e2e4e7;border-radius:8px;text-decoration:none"><span class="dashicons %s"></span>%s</a>', esc_url( admin_url( $l[0] ) ), esc_attr( $l[2] ), esc_html( $l[1] ) );
+		if ( class_exists( 'Scrolla_Types' ) ) {
+			foreach ( Scrolla_Types::config() as $pt => $t ) {
+				$links[] = [ 'edit.php?post_type=' . $pt, $t['meervoud'] ?? ( $t['enkelvoud'] ?? $pt ), $t['icon'] ?? 'dashicons-admin-post' ];
 			}
 		}
-		echo '</div><p style="margin-top:14px">Hulp nodig? Mail <a href="mailto:support@scrolla.nl">support@scrolla.nl</a> of bel <a href="tel:+31850160806">085 016 08 06</a>.</p>';
+		if ( class_exists( 'WooCommerce' ) ) {
+			$links[] = [ 'edit.php?post_type=product', 'Producten', 'dashicons-products' ];
+			$links[] = [ 'admin.php?page=wc-orders', 'Bestellingen', 'dashicons-cart' ];
+		}
+		$links[] = [ 'admin.php?page=e-form-submissions', 'Formulierinzendingen', 'dashicons-email-alt' ];
+		$links[] = [ 'upload.php', 'Media', 'dashicons-admin-media' ];
+		$links[] = [ 'admin.php?page=scrolla-algemeen', 'Algemeen', 'dashicons-building' ];
+		$links[] = [ 'nav-menus.php', 'Menu\'s', 'dashicons-menu' ];
+
+		$naam = wp_get_current_user()->first_name ?: wp_get_current_user()->display_name;
+		echo '<style>.sc-tegels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:4px 0 16px}
+		.sc-tegels a{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #e2e4e7;border-radius:10px;text-decoration:none;color:#1d2327;font-weight:600;transition:border-color .3s ease,background .3s ease}
+		.sc-tegels a:hover{border-color:' . esc_attr( $p ) . ';background:' . esc_attr( $zacht ) . '}.sc-tegels .dashicons{color:' . esc_attr( $p ) . ';font-size:22px;width:22px;height:22px}
+		.sc-recent{margin:0 0 16px}.sc-recent li{display:flex;justify-content:space-between;gap:12px;margin:0;padding:6px 0;border-bottom:1px solid #f0f0f1}.sc-recent span{color:#787c82}
+		.sc-hulp{background:' . esc_attr( $zacht ) . ';border-radius:10px;padding:12px 16px;margin:0}</style>';
+		printf( '<p style="font-size:15px;margin-top:0">Hoi %s, wat wil je vandaag aanpassen?</p>', esc_html( $naam ) );
+		echo '<div class="sc-tegels">';
+		foreach ( $links as $l ) {
+			if ( self::in_menu( $l[0] ) ) {
+				$icon = str_starts_with( (string) $l[2], 'dashicons-' ) ? '<span class="dashicons ' . esc_attr( $l[2] ) . '"></span>' : '<span class="dashicons dashicons-admin-post"></span>';
+				printf( '<a href="%s">%s%s</a>', esc_url( admin_url( $l[0] ) ), $icon, esc_html( $l[1] ) ); // phpcs:ignore
+			}
+		}
+		echo '</div>';
+		$recent = get_posts( [ 'post_type' => 'any', 'posts_per_page' => 5, 'orderby' => 'modified', 'post_status' => [ 'publish', 'draft' ] ] );
+		$recent = array_filter( $recent, fn( $r ) => current_user_can( 'edit_post', $r->ID ) && ! in_array( $r->post_type, [ 'elementor_library', 'attachment', 'nav_menu_item' ], true ) );
+		if ( $recent ) {
+			echo '<h3 style="font-size:13px;margin:0 0 4px">Laatst bewerkt</h3><ul class="sc-recent">';
+			foreach ( $recent as $r ) {
+				printf( '<li><a href="%s">%s</a><span>%s geleden</span></li>', esc_url( get_edit_post_link( $r->ID ) ), esc_html( get_the_title( $r ) ?: '(zonder titel)' ), esc_html( human_time_diff( strtotime( $r->post_modified_gmt . ' UTC' ) ) ) );
+			}
+			echo '</ul>';
+		}
+		echo '<p class="sc-hulp">Hulp nodig? Mail <a href="mailto:support@scrolla.nl">support@scrolla.nl</a> of bel <a href="tel:+31850160806">085 016 08 06</a>.</p>';
+	}
+
+	/** Staat dit scherm in het menu van de huidige gebruiker (na rechten en Menu per rol)? */
+	private static function in_menu( string $slug ): bool {
+		global $menu, $submenu;
+		$want = html_entity_decode( $slug );
+		$base = str_starts_with( $want, 'admin.php?page=' ) ? substr( $want, 15 ) : $want;
+		foreach ( (array) $menu as $m ) {
+			if ( in_array( html_entity_decode( (string) ( $m[2] ?? '' ) ), [ $want, $base ], true ) ) {
+				return true;
+			}
+		}
+		foreach ( (array) $submenu as $subs ) {
+			foreach ( (array) $subs as $s ) {
+				if ( in_array( html_entity_decode( (string) ( $s[2] ?? '' ) ), [ $want, $base ], true ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public function widget_systeem(): void {
